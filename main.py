@@ -1,1 +1,1 @@
-print(input())
+from flask import Flask
