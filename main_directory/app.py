@@ -10,8 +10,7 @@ db_session.global_init("main_directory/models/db/database.db")
 
 @app.route("/")
 def start():
-    db_sess = db_session.create_session()
-    return str(db_sess.query(User).count())
+    return "developing"
 
 
 def main():
