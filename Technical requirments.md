@@ -85,6 +85,8 @@
 - `id`  
 - `title`  
 - `content`  
+- `image` 
+- `likes_amount`
 - `user_id`  
 - `created_at`  
 
