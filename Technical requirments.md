@@ -79,7 +79,8 @@
 ### Таблица `users`
 - `id`  
 - `username`  
-- `password`  
+- `password`
+- `created_at`
 
 ### Таблица `posts`
 - `id`  
