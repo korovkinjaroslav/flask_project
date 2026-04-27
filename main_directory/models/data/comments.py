@@ -11,8 +11,10 @@ class Comment(SqlAlchemyBase):
     content = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"),
                                 nullable=False)
-    user = orm.relationship('User')
-    post_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    # НАДО БУДЕТ ФОРЕЙН КЕЙ ДЛЯ ПОСТА СДЕЛАТЬ ОБЯЗАТЕЛЬНО!!!
+    user = orm.relationship('User', back_populates="comments")
+    post_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey("posts.id"),
+                                nullable=False)
+    post = orm.relationship("Post", back_populates="comments")
     created_at = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now)
