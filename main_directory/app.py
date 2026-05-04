@@ -13,7 +13,6 @@ from main_directory.routes.main import main_router
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(12)
 
-app = Flask(__name__)
 api = Api(app)
 api.add_resource(posts_api.PostResource, '/api/posts/<int:post_id>')
 api.add_resource(posts_api.PostListResource, '/api/posts')
