@@ -7,8 +7,6 @@ __pycache__/
 
 .idea/
 
-/main_directory/models/db/database.db
-*.db
 
 .env
 .env.*
