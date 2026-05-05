@@ -11,7 +11,7 @@ class Post(SqlAlchemyBase, SerializerMixin):
                            primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     content = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    image = sqlalchemy.Column(sqlalchemy.LargeBinary, nullable=True)
+    image = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     likes_amount = sqlalchemy.Column(
         sqlalchemy.Integer, nullable=False, default=0)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"),

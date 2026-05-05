@@ -1,3 +1,5 @@
+from urllib import request
+
 import flask
 from flask_restful import reqparse, abort, Api, Resource
 import base64
@@ -12,14 +14,6 @@ blueprint = flask.Blueprint(
 )
 
 
-def serialize(item):
-    res = item.to_dict(only=('title', 'content', 'likes_amount', 'user_id', 'created_at'))
-    img = getattr(item, 'image', None)
-    if img is None:
-        res['image'] = None
-    else:
-        res['image'] = base64.b64encode(img).decode('utf-8')
-    return res
 
 def abort_if_post_not_found(post_id):
     session = db_session.create_session()
@@ -31,8 +25,8 @@ class PostResource(Resource):
     def get(self, post_id):
         abort_if_post_not_found(post_id)
         session = db_session.create_session()
-        posts = session.get(Post, post_id)
-        return flask.jsonify({'news': serialize(posts)})
+        post = session.get(Post, post_id)
+        return flask.jsonify({'post': post.to_dict(only=('title', 'content', 'likes_amount', 'user_id', 'created_at', 'image'))})
 
     def delete(self, post_id):
         abort_if_post_not_found(post_id)
@@ -48,13 +42,14 @@ parser.add_argument('title', required=True)
 parser.add_argument('content', required=True)
 parser.add_argument('image', required=True) # !!!биты предадутся в виде строки!!!
 parser.add_argument('user_id', required=True, type=int)
+parser.add_argument('image_type', required=True)
 
 class PostListResource(Resource):
     def get(self):
         session = db_session.create_session()
         posts = session.query(Post).all()
 
-        return flask.jsonify({'news': [serialize(item) for item in posts]})
+        return flask.jsonify({'posts': [item.to_dict(only=('title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')) for item in posts]})
 
     def post(self):
         print("qqq")
@@ -63,7 +58,7 @@ class PostListResource(Resource):
         new_post = Post(
             title=args['title'],
             content=args['content'],
-            image=base64.b64decode(args['image']),
+            image=args['image'],
             user_id=args["user_id"],
         )
         session.add(new_post)
