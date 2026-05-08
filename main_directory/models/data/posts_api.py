@@ -26,7 +26,7 @@ class PostResource(Resource):
         abort_if_post_not_found(post_id)
         session = db_session.create_session()
         post = session.get(Post, post_id)
-        return flask.jsonify({'post': post.to_dict(only=('title', 'content', 'likes_amount', 'user_id', 'created_at', 'image'))})
+        return flask.jsonify({'post': post.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image'))})
 
     def delete(self, post_id):
         abort_if_post_not_found(post_id)
@@ -49,7 +49,7 @@ class PostListResource(Resource):
         session = db_session.create_session()
         posts = session.query(Post).all()
 
-        return flask.jsonify({'posts': [item.to_dict(only=('title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')) for item in posts]})
+        return flask.jsonify({'posts': [item.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')) for item in posts]})
 
     def post(self):
         print("qqq")

@@ -16,6 +16,7 @@
             <a class="navbar-brand mb-0" href="/">Наше приложение</a>
             <div>
                 {% if current_user.is_authenticated %}
+                    <span>{{current_user.username}}</span>
                     <a class="btn btn-outline-danger btn-sm" href="/logout">Выход</a>
                 {% else %}
                     <a class="btn btn-outline-primary btn-sm mr-2" href="/login">Вход</a>

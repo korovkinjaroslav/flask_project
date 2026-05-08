@@ -9,13 +9,21 @@ from main_directory.models.data import db_session, posts_api
 from main_directory.models.data.users import User
 from main_directory.routes.auth import auth_router
 from main_directory.routes.main import main_router
+from main_directory.routes import like_api
+
+
+import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(12)
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
+    days=365
+)
 
 api = Api(app)
 api.add_resource(posts_api.PostResource, '/api/posts/<int:post_id>')
 api.add_resource(posts_api.PostListResource, '/api/posts')
+api.add_resource(like_api.LikePost, '/api/like/<int:post_id>')
 
 _db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "db", "database.db")
 db_session.global_init(_db_path)
