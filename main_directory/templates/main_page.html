@@ -25,7 +25,8 @@
                                 class="btn btn-sm btn-link p-0 like-btn"
                                 aria-label="Лайк"
                                 data-post-id="{{ post['id'] }}">
-                            <img src="/static/img/like.svg" id="like_img-{{ post['id'] }}" alt="Лайк" width="28" height="28">
+                            <img src="/static/img/like.svg" id="like_img-{{ post['id'] }}" alt="Лайк" width="28"
+                                 height="28">
                         </button>
                         <span id="likes-count-{{ post['id'] }}" class="ms-2">{{ post['likes_amount'] }}</span>
                     </form>
@@ -42,51 +43,76 @@
 
 {% endfor %}
 <script>
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.like-btn');
-  if (!btn) return;
-
-  const postId = btn.dataset.postId;
-  const form = document.getElementById(`like-form-${postId}`);
-  if (!form) return;
-
-  const countEl = document.getElementById(`likes-count-${postId}`);
-  const imageEl = document.getElementById(`like_img-${postId}`);
-  const msgEl = document.getElementById("messages");
-  const prev = parseInt(countEl.textContent || '0', 10);
-  btn.disabled = true;
-
-  const formData = new FormData(form);
-  const headers = {};
-
-  try {
-    const res = await fetch(form.action, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: headers,
-      body: formData
-    });
-
-    if (!res.ok) throw new Error('Network response was not ok');
-
-    const data = await res.json();
-    if (data && typeof data.likes !== 'undefined' && data.success == true) {
-      countEl.textContent = data.likes;
-      imageEl.src = "/static/img/liked.svg"
-    } else {
-      msgEl.hidden = false;
-      msgEl.textContent = data.problem
+(async function() {
+    const posts = {{ posts|tojson|safe }};
+    console.log(posts)
+    for (const post of posts.posts) {
+        console.log(post.id)
+        const res = await fetch(`/api/check_like/${post.id}`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {}
+            });
+        const data = await res.json();
+        if (data.exists) {
+            document.getElementById(`like_img-${post.id}`).src = "/static/img/liked.svg"
+            document.getElementById(`like-form-${post.id}`).action = `/api/remove_like/${post.id}`;
+        }
     }
-  } catch (err) {
-    msgEl.hidden = false;
-      msgEl.textContent = "ОШИБКА"
-  } finally {
-    btn.disabled = false;
-  }
-  new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
-      msgEl.hidden = true;
-  });
-});
+})();
+</script>
+<script>
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.like-btn');
+        if (!btn) return;
+
+        const postId = btn.dataset.postId;
+        const form = document.getElementById(`like-form-${postId}`);
+        if (!form) return;
+
+        const countEl = document.getElementById(`likes-count-${postId}`);
+        const imageEl = document.getElementById(`like_img-${postId}`);
+        const msgEl = document.getElementById("messages");
+        const prev = parseInt(countEl.textContent || '0', 10);
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const headers = {};
+
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: headers,
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Network response was not ok');
+
+            const data = await res.json();
+            if (data && typeof data.likes !== 'undefined' && data.success) {
+                countEl.textContent = data.likes;
+                if (form.getAttribute('action') === `/api/remove_like/${postId}`) {
+                    form.action = `/api/like/${postId}`;
+                    imageEl.src = "static/img/like.svg";
+                } else {
+                    form.action = `/api/remove_like/${postId}`;
+                    imageEl.src = "static/img/liked.svg";
+                }
+            } else {
+                msgEl.hidden = false;
+                msgEl.textContent = data.problem
+            }
+        } catch (err) {
+            msgEl.hidden = false;
+            msgEl.textContent = "ОШИБКА"
+        } finally {
+            btn.disabled = false;
+        }
+        new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
+            msgEl.hidden = true;
+        });
+    });
 </script>
 
 {% endblock %}

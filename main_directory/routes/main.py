@@ -19,8 +19,6 @@ def start():
 
 @main_router.route("/<int:page_number>")
 def main_page(page_number):
-    user_id = session.get('_user_id', None)
-    print(user_id)
     return render_template('main_page.html', posts=requests.get(
         "http://127.0.0.1:5000/api/posts"
     ).json())

@@ -24,6 +24,8 @@ api = Api(app)
 api.add_resource(posts_api.PostResource, '/api/posts/<int:post_id>')
 api.add_resource(posts_api.PostListResource, '/api/posts')
 api.add_resource(like_api.LikePost, '/api/like/<int:post_id>')
+api.add_resource(like_api.RemoveLike, '/api/remove_like/<int:post_id>')
+api.add_resource(like_api.CheckLike, '/api/check_like/<int:post_id>')
 
 _db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "db", "database.db")
 db_session.global_init(_db_path)
