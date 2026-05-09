@@ -12,7 +12,7 @@
                         <small class="text-muted">{{ post['created_at'] }}</small>
                     </div>
                 </div>
-
+                <h5 class="mt-0">{{ post['title'] }}</h5>
                 <p class="mt-2 mb-2">{{ post['content'] }}</p>
                 {% if post['image'] %}
                 <img src="{{ post['image'] }}" alt="" class="img-fluid rounded mb-2">
@@ -25,7 +25,7 @@
                                 class="btn btn-sm btn-link p-0 like-btn"
                                 aria-label="Лайк"
                                 data-post-id="{{ post['id'] }}">
-                            <img src="/static/img/like.svg" alt="Лайк" width="28" height="28">
+                            <img src="/static/img/like.svg" id="like_img-{{ post['id'] }}" alt="Лайк" width="28" height="28">
                         </button>
                         <span id="likes-count-{{ post['id'] }}" class="ms-2">{{ post['likes_amount'] }}</span>
                     </form>
@@ -51,8 +51,9 @@ document.addEventListener('click', async (e) => {
   if (!form) return;
 
   const countEl = document.getElementById(`likes-count-${postId}`);
+  const imageEl = document.getElementById(`like_img-${postId}`);
+  const msgEl = document.getElementById("messages");
   const prev = parseInt(countEl.textContent || '0', 10);
-  countEl.textContent = prev + 1;
   btn.disabled = true;
 
   const formData = new FormData(form);
@@ -69,18 +70,22 @@ document.addEventListener('click', async (e) => {
     if (!res.ok) throw new Error('Network response was not ok');
 
     const data = await res.json();
-    if (data && typeof data.likes !== 'undefined') {
+    if (data && typeof data.likes !== 'undefined' && data.success == true) {
       countEl.textContent = data.likes;
+      imageEl.src = "/static/img/liked.svg"
     } else {
-      countEl.textContent = prev;
-      console.error('Invalid server response', data);
+      msgEl.hidden = false;
+      msgEl.textContent = data.problem
     }
   } catch (err) {
-    countEl.textContent = prev;
-    console.error('Like failed', err);
+    msgEl.hidden = false;
+      msgEl.textContent = "ОШИБКА"
   } finally {
     btn.disabled = false;
   }
+  new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
+      msgEl.hidden = true;
+  });
 });
 </script>
 

@@ -10,6 +10,9 @@ blueprint = flask.Blueprint(
 
 class LikePost(Resource):
     def post(self, post_id):
+        if flask.session.get('_user_id') is None:
+            return {"success": False,
+                    "problem": "ВЫ НЕ ЗАРЕГИСТРИРОВАНЫ"}
         return {
             "success": True,
             "likes": 123

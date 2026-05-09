@@ -16,16 +16,17 @@
             <a class="navbar-brand mb-0" href="/">Наше приложение</a>
             <div>
                 {% if current_user.is_authenticated %}
-                    <span>{{current_user.username}}</span>
-                    <a class="btn btn-outline-danger btn-sm" href="/logout">Выход</a>
+                <span>{{current_user.username}}</span>
+                <a class="btn btn-outline-danger btn-sm" href="/logout">Выход</a>
                 {% else %}
-                    <a class="btn btn-outline-primary btn-sm mr-2" href="/login">Вход</a>
-                    <a class="btn btn-primary btn-sm" href="/register">Регистрация</a>
+                <a class="btn btn-outline-primary btn-sm mr-2" href="/login">Вход</a>
+                <a class="btn btn-primary btn-sm" href="/register">Регистрация</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 </header>
+<div class="alert alert-primary" role="alert" id="messages" hidden="true"></div>\
 <main role="main" class="container py-4">
     {% block content %}{% endblock %}
 </main>
