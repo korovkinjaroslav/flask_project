@@ -1,11 +1,14 @@
+from random import seed
 from urllib import request
 
 import flask
 from flask_restful import reqparse, abort, Api, Resource
+from sqlalchemy import desc
 import base64
 
 from . import db_session
 from .posts import Post
+from .users import User
 
 blueprint = flask.Blueprint(
     'post_api',
@@ -13,7 +16,7 @@ blueprint = flask.Blueprint(
     template_folder='templates'
 )
 
-
+POSTS_ON_PAGE_LIMIT = 10
 
 def abort_if_post_not_found(post_id):
     session = db_session.create_session()
@@ -52,7 +55,6 @@ class PostListResource(Resource):
         return flask.jsonify({'posts': [item.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')) for item in posts]})
 
     def post(self):
-        print("qqq")
         args = parser.parse_args()
         session = db_session.create_session()
         new_post = Post(
@@ -64,3 +66,17 @@ class PostListResource(Resource):
         session.add(new_post)
         session.commit()
         return flask.jsonify({'id': new_post.id})
+
+
+class GetPosts(Resource):
+    def get(self, first_post):
+        res = {'posts':[]}
+        sess = db_session.create_session()
+        posts = sess.query(Post).filter(Post.id <= first_post).order_by(desc(Post.id)).limit(POSTS_ON_PAGE_LIMIT)
+        first_post_of_next_page = posts[posts.count() - 1].id + 1
+        for post in posts:
+            res['posts'].append(
+                post.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')))
+            res['posts'][-1]["author"] = sess.get(User, res['posts'][-1]["user_id"]).username
+        res['first_post_of_next_page'] = first_post_of_next_page
+        return flask.jsonify(res)
