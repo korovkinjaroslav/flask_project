@@ -16,7 +16,7 @@ blueprint = flask.Blueprint(
     template_folder='templates'
 )
 
-POSTS_ON_PAGE_LIMIT = 1
+POSTS_ON_PAGE_LIMIT = 10
 
 def abort_if_post_not_found(post_id):
     session = db_session.create_session()
