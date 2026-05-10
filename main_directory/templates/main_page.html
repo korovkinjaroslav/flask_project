@@ -40,8 +40,10 @@
         </div>
     </div>
 </article>
-
 {% endfor %}
+{%if posts['posts']|length > 0%}<a href="/main_page/{{posts['first_post_of_next_page']}}" class="nav-link">на следующую страницу -></a>
+{%else%} <div class="alert alert-success" role="alert" clr="green">Похоже, вы долистали до конца ленты</div>
+{%endif%}
 <script>
 (async function() {
     const posts = {{ posts|tojson|safe }};

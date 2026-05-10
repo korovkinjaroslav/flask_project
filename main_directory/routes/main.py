@@ -20,7 +20,7 @@ def start():
     sess = db_session.create_session()
     fpost = sess.query(Post).order_by(desc(Post.id)).first()
     print(fpost.id)
-    return redirect(f"/1/{fpost.id}")
+    return redirect(f"/main_page/{fpost.id}")
 
 
 """TODO:
@@ -29,8 +29,8 @@ posts должен содержать author
  """
 
 
-@main_router.route("/<int:page_number>/<int:first_post>")
-def main_page(page_number, first_post):
+@main_router.route("/main_page/<int:first_post>")
+def main_page(first_post):
     print(first_post)
     return render_template('main_page.html', posts=requests.get(
         f"http://127.0.0.1:5000/api/get_posts_from/{first_post}"

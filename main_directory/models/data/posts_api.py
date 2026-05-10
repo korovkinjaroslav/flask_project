@@ -16,7 +16,7 @@ blueprint = flask.Blueprint(
     template_folder='templates'
 )
 
-POSTS_ON_PAGE_LIMIT = 10
+POSTS_ON_PAGE_LIMIT = 1
 
 def abort_if_post_not_found(post_id):
     session = db_session.create_session()
@@ -73,7 +73,7 @@ class GetPosts(Resource):
         res = {'posts':[]}
         sess = db_session.create_session()
         posts = sess.query(Post).filter(Post.id <= first_post).order_by(desc(Post.id)).limit(POSTS_ON_PAGE_LIMIT)
-        first_post_of_next_page = posts[posts.count() - 1].id + 1
+        first_post_of_next_page = posts[posts.count() - 1].id - 1
         for post in posts:
             res['posts'].append(
                 post.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')))
