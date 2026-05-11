@@ -42,10 +42,21 @@
             <p class="text-muted mb-0">Пока никто не написал.</p>
         {% else %}
             {% for c in comments %}
-                <div class="border-bottom py-2">
+                <div class="border-bottom py-2 show-comment">
                     <strong>{{ c.author }}</strong>
                     <small class="text-muted">{{ c.created_at }}</small>
                     <p class="mb-0 mt-1">{{ c.content }}</p>
+                    {%if is_admin or current_user.id == c['user_id']%}
+                    <form id="delete-comment-{{ c['id'] }}" action="/api/delete_comment/{{ c['id'] }}" method="post"
+                          class="me-4">
+                        <button type="button"
+                                class="btn btn-sm btn-link p-0 like-btn"
+                                onclick="deleteComment({{ c['id'] }})">
+                            <img src="/static/img/delete.svg" id="delete_img-{{ c['id'] }}" alt="удалить" width="28"
+                                 height="28">
+                        </button>
+                    </form>
+                    {%endif%}
                 </div>
             {% endfor %}
         {% endif %}
@@ -139,5 +150,13 @@
             msgEl.hidden = true;
         });
     });
+</script>
+<script>
+    function deleteComment(postId) {
+        fetch(`/api/delete_comment/${postId}`, {method: 'POST'}).then(response => response.json()).then(data => {
+            document.getElementById(`delete-comment-${postId}`).closest('.show-comment').remove();
+        }).catch(error => {
+        });
+    }
 </script>
 {%endblock%}

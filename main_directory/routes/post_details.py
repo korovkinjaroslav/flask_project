@@ -1,5 +1,5 @@
 import requests
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, session
 from flask_login import login_required, current_user
 
 from main_directory.forms.commentForms import CommentForm
@@ -28,6 +28,8 @@ def _load_comments(post_id):
             "content": c.content,
             "author": u.username if u else "?",
             "created_at": c.created_at,
+            "user_id": u.id,
+            "id": c.id
         })
     return out
 
@@ -39,12 +41,17 @@ def show_post(post_id):
         return redirect("/")
     comments = _load_comments(post_id)
     form = CommentForm()
+    if session.get("_user_id") == None:
+        is_admin = False
+    else:
+        is_admin = db_session.create_session().get(User, session.get('_user_id')).status
     return render_template(
         "post_details.html",
         title="Пост",
         post=post,
         comments=comments,
         form=form,
+        is_admin=is_admin,
     )
 
 
@@ -68,10 +75,15 @@ def add_comment(post_id):
     if post is None:
         return redirect("/")
     comments = _load_comments(post_id)
+    if session.get("_user_id") == None:
+        is_admin = False
+    else:
+        is_admin = db_session.create_session().get(User, session.get('_user_id')).status
     return render_template(
         "post_details.html",
         title="Пост",
         post=post,
         comments=comments,
         form=form,
+        is_admin=is_admin
     )
