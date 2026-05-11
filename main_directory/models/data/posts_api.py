@@ -29,7 +29,9 @@ class PostResource(Resource):
         abort_if_post_not_found(post_id)
         session = db_session.create_session()
         post = session.get(Post, post_id)
-        return flask.jsonify({'post': post.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image'))})
+        d = {'post': post.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image'))}
+        d['post']['author'] = session.get(User, d['post']["user_id"]).username
+        return flask.jsonify(d)
 
     def delete(self, post_id):
         abort_if_post_not_found(post_id)

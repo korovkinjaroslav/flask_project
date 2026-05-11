@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% for post in posts['posts'] %}
-
 <article class="card mb-3">
     <div class="card-body">
         <div class="d-flex">
@@ -31,26 +29,17 @@
                         </button>
                         <span id="likes-count-{{ post['id'] }}" class="ms-2">{{ post['likes_amount'] }}</span>
                     </form>
-
-                    <a href="/details/{{post['id']}}" class="btn btn-sm btn-link p-0 d-flex align-items-center" aria-label="Комментарий">
-                        <img src="/static/img/comment.svg" alt="Комментарий" width="28" height="28">
-                    </a>
                 </div>
-
             </div>
         </div>
     </div>
 </article>
-{% endfor %}
-{%if posts['posts']|length > 0%}<a href="/main_page/{{posts['first_post_of_next_page']}}" class="nav-link">на следующую страницу -></a>
-{%else%} <div class="alert alert-success" role="alert" clr="green">Похоже, вы долистали до конца ленты</div>
-{%endif%}
 <script>
 (async function() {
-    const posts = {{ posts|tojson|safe }};
+    const posts = {{ post|tojson|safe }};
+    const post = posts.post
     console.log(posts)
-    for (const post of posts.posts) {
-        console.log(post.id)
+    console.log(post.id)
         const res = await fetch(`/api/check_like/${post.id}`, {
                 method: 'GET',
                 credentials: 'same-origin',
@@ -117,5 +106,4 @@
         });
     });
 </script>
-
-{% endblock %}
+{%endblock%}

@@ -10,6 +10,7 @@ from main_directory.models.data.users import User
 from main_directory.routes.auth import auth_router
 from main_directory.routes.main import main_router
 from main_directory.routes import like_api
+from main_directory.routes.post_details import detail_router
 
 
 import datetime
@@ -40,6 +41,7 @@ def load_user(user_id):
 
 app.register_blueprint(main_router)
 app.register_blueprint(auth_router)
+app.register_blueprint(detail_router)
 
 
 def main():
