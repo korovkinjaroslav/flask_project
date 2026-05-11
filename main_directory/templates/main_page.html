@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for post in posts['posts'] %}
+
+<article class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-0">{{ post['author'] }}</h6>
+                        <small class="text-muted">{{ post['created_at'] }}</small>
+                    </div>
+                </div>
+                <h5 class="mt-0">{{ post['title'] }}</h5>
+                <p class="mt-2 mb-2">{{ post['content'] }}</p>
+                {% if post['image'] %}
+                <img src="{{ post['image'] }}" alt="" class="img-fluid rounded mb-2">
+                {% endif %}
+
+                <div class="d-flex align-items-center">
+                    <form id="like-form-{{ post['id'] }}" action="/api/like/{{ post['id'] }}" method="post"
+                          class="me-4">
+                        <button type="button"
+                                class="btn btn-sm btn-link p-0 like-btn"
+                                aria-label="Лайк"
+                                data-post-id="{{ post['id'] }}">
+                            <img src="/static/img/like.svg" id="like_img-{{ post['id'] }}" alt="Лайк" width="28"
+                                 height="28">
+                        </button>
+                        <span id="likes-count-{{ post['id'] }}" class="ms-2">{{ post['likes_amount'] }}</span>
+                    </form>
+
+                    <a href="/details/{{post['id']}}" class="btn btn-sm btn-link p-0 d-flex align-items-center" aria-label="Комментарий">
+                        <img src="/static/img/comment.svg" alt="Комментарий" width="28" height="28">
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</article>
+{% endfor %}
+{%if posts['posts']|length > 0%}<a href="/main_page/{{posts['first_post_of_next_page']}}" class="nav-link">на следующую страницу -></a>
+{%else%} <div class="alert alert-success" role="alert" clr="green">Похоже, вы долистали до конца ленты</div>
+{%endif%}
+<script>
+(async function() {
+    const posts = {{ posts|tojson|safe }};
+    console.log(posts)
+    for (const post of posts.posts) {
+        console.log(post.id)
+        const res = await fetch(`/api/check_like/${post.id}`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {}
+            });
+        const data = await res.json();
+        if (data.exists) {
+            document.getElementById(`like_img-${post.id}`).src = "/static/img/liked.svg"
+            document.getElementById(`like-form-${post.id}`).action = `/api/remove_like/${post.id}`;
+        }
+    }
+})();
+</script>
+<script>
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.like-btn');
+        if (!btn) return;
+
+        const postId = btn.dataset.postId;
+        const form = document.getElementById(`like-form-${postId}`);
+        if (!form) return;
+
+        const countEl = document.getElementById(`likes-count-${postId}`);
+        const imageEl = document.getElementById(`like_img-${postId}`);
+        const msgEl = document.getElementById("messages");
+        const prev = parseInt(countEl.textContent || '0', 10);
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const headers = {};
+
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: headers,
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Network response was not ok');
+
+            const data = await res.json();
+            if (data && typeof data.likes !== 'undefined' && data.success) {
+                countEl.textContent = data.likes;
+                if (form.getAttribute('action') === `/api/remove_like/${postId}`) {
+                    form.action = `/api/like/${postId}`;
+                    imageEl.src = "/static/img/like.svg";
+                } else {
+                    form.action = `/api/remove_like/${postId}`;
+                    imageEl.src = "/static/img/liked.svg";
+                }
+            } else {
+                msgEl.hidden = false;
+                msgEl.textContent = data.problem
+            }
+        } catch (err) {
+            msgEl.hidden = false;
+            msgEl.textContent = "ОШИБКА"
+        } finally {
+            btn.disabled = false;
+        }
+        new Promise(resolve => setTimeout(resolve, 10000)).then(() => {
+            msgEl.hidden = true;
+        });
+    });
+</script>
+
+{% endblock %}

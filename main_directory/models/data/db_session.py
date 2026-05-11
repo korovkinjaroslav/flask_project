@@ -4,13 +4,13 @@ from sqlalchemy.orm import Session
 
 SqlAlchemyBase = orm.declarative_base()
 
-__factory = None
+_scoped_session = None
 
 
 def global_init(db_file):
-    global __factory
+    global _scoped_session
 
-    if __factory:
+    if _scoped_session:
         return
 
     if not db_file or not db_file.strip():
@@ -19,8 +19,8 @@ def global_init(db_file):
     conn_str = f'sqlite:///{db_file.strip()}?check_same_thread=False'
     print(f"Подключение к базе данных по адресу {conn_str}")
 
-    engine = sa.create_engine(conn_str, echo=False)
-    __factory = orm.sessionmaker(bind=engine)
+    engine = sa.create_engine(conn_str, echo=False, pool_pre_ping=True)
+    _scoped_session = orm.scoped_session(orm.sessionmaker(bind=engine))
 
     from . import __all_models
 
@@ -28,5 +28,12 @@ def global_init(db_file):
 
 
 def create_session() -> Session:
-    global __factory
-    return __factory()
+    if not _scoped_session:
+        raise RuntimeError("База не инициализирована (вызов global_init)")
+    return _scoped_session()
+
+
+def remove_session():
+    """Закрыть сессию текущего потока и вернуть соединение в пул (вызывать из teardown Flask)."""
+    if _scoped_session is not None:
+        _scoped_session.remove()
