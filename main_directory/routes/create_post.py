@@ -4,7 +4,7 @@ from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
-from main_directory.forms.userForms import CreatePostForm
+from main_directory.forms.create_postForms import CreatePostForm
 from main_directory.models.data import db_session
 from main_directory.models.data.posts import Post
 

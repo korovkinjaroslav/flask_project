@@ -32,6 +32,13 @@ api.add_resource(like_api.CheckLike, '/api/check_like/<int:post_id>')
 
 _db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "db", "database.db")
 db_session.global_init(_db_path)
+
+
+@app.teardown_appcontext
+def shutdown_db_session(exception):
+    db_session.remove_session()
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth_router.login'

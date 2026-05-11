@@ -34,22 +34,57 @@
         </div>
     </div>
 </article>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Комментарии</h5>
+        {% if comments|length == 0 %}
+            <p class="text-muted mb-0">Пока никто не написал.</p>
+        {% else %}
+            {% for c in comments %}
+                <div class="border-bottom py-2">
+                    <strong>{{ c.author }}</strong>
+                    <small class="text-muted">{{ c.created_at }}</small>
+                    <p class="mb-0 mt-1">{{ c.content }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% if current_user.is_authenticated %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Ваш комментарий</h5>
+        <form action="{{ url_for('detail_router.add_comment', post_id=post['id']) }}" method="post">
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.content.label }}<br>
+                {{ form.content(class="form-control", rows=3) }}
+            </p>
+            {% for error in form.content.errors %}
+                <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+            <p>{{ form.submit(class="btn btn-primary") }}</p>
+        </form>
+    </div>
+</div>
+{% else %}
+<p class="text-muted"><a href="{{ url_for('auth_router.login') }}">Войдите</a>, чтобы оставить комментарий.</p>
+{% endif %}
+
 <script>
 (async function() {
-    const posts = {{ post|tojson|safe }};
-    const post = posts.post
-    console.log(posts)
-    console.log(post.id)
-        const res = await fetch(`/api/check_like/${post.id}`, {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: {}
-            });
-        const data = await res.json();
-        if (data.exists) {
-            document.getElementById(`like_img-${post.id}`).src = "/static/img/liked.svg"
-            document.getElementById(`like-form-${post.id}`).action = `/api/remove_like/${post.id}`;
-        }
+    const post = {{ post|tojson|safe }};
+    const res = await fetch(`/api/check_like/${post.id}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {}
+        });
+    const data = await res.json();
+    if (data.exists) {
+        document.getElementById(`like_img-${post.id}`).src = "/static/img/liked.svg"
+        document.getElementById(`like-form-${post.id}`).action = `/api/remove_like/${post.id}`;
     }
 })();
 </script>
@@ -65,7 +100,6 @@
         const countEl = document.getElementById(`likes-count-${postId}`);
         const imageEl = document.getElementById(`like_img-${postId}`);
         const msgEl = document.getElementById("messages");
-        const prev = parseInt(countEl.textContent || '0', 10);
         btn.disabled = true;
 
         const formData = new FormData(form);
