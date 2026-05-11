@@ -11,6 +11,7 @@ from main_directory.routes.auth import auth_router
 from main_directory.routes.main import main_router
 from main_directory.routes import like_api
 from main_directory.routes.post_details import detail_router
+from main_directory.routes.create_post import create_post_router
 
 
 import datetime
@@ -33,6 +34,7 @@ _db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "d
 db_session.global_init(_db_path)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'auth_router.login'
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -42,6 +44,7 @@ def load_user(user_id):
 app.register_blueprint(main_router)
 app.register_blueprint(auth_router)
 app.register_blueprint(detail_router)
+app.register_blueprint(create_post_router)
 
 
 def main():

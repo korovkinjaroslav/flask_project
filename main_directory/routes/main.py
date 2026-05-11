@@ -1,9 +1,7 @@
-from tempfile import template
-
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template
+from flask_login import current_user
 
 import requests
-import json
 
 from werkzeug.utils import redirect
 
@@ -19,14 +17,12 @@ main_router = Blueprint("main_router", __name__)
 def start():
     sess = db_session.create_session()
     fpost = sess.query(Post).order_by(desc(Post.id)).first()
+    if fpost is None:
+        if current_user.is_authenticated:
+            return redirect("/create_post")
+        return redirect("/login")
     print(fpost.id)
     return redirect(f"/main_page/{fpost.id}")
-
-
-"""TODO:
-posts должен содержать author
-нужно передавать индекс поста где заканчивается страница
- """
 
 
 @main_router.route("/main_page/<int:first_post>")
