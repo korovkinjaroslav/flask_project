@@ -49,24 +49,14 @@ parser.add_argument('image_type', required=True)
 class PostListResource(Resource):
     def get(self):
         session = db_session.create_session()
+        user_id = flask.session.get('_user_id')
+        if user_id is None or not session.get(User, user_id).status:
+            return {"error":"ошибка доступа"}
         posts = session.query(Post).all()
 
         return flask.jsonify({'posts': [
             item.to_dict(only=('id', 'title', 'content', 'likes_amount', 'user_id', 'created_at', 'image')) for item in
             posts]})
-
-    def post(self):
-        args = parser.parse_args()
-        session = db_session.create_session()
-        new_post = Post(
-            title=args['title'],
-            content=args['content'],
-            image=args['image'],
-            user_id=args["user_id"],
-        )
-        session.add(new_post)
-        session.commit()
-        return flask.jsonify({'id': new_post.id})
 
 
 class GetPosts(Resource):
