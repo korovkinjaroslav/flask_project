@@ -6,8 +6,8 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy_serializer import SerializerMixin
 
-USER_STATUS_USER = "user"
-USER_STATUS_ADMIN = "admin"
+USER_STATUS_USER = False
+USER_STATUS_ADMIN = True
 
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
@@ -20,7 +20,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                  nullable=False, unique=True)
     password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     status = sqlalchemy.Column(
-        sqlalchemy.String,
+        sqlalchemy.Boolean,
         nullable=False,
         default=USER_STATUS_USER,
     )

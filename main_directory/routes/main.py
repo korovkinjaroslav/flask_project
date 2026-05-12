@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, session
 from flask_login import current_user
 
 import requests
@@ -7,6 +7,7 @@ from werkzeug.utils import redirect
 
 from main_directory.models.data import db_session
 from main_directory.models.data.posts import Post
+from main_directory.models.data.users import User
 
 from sqlalchemy import desc
 
@@ -27,7 +28,12 @@ def start():
 
 @main_router.route("/main_page/<int:first_post>")
 def main_page(first_post):
-    print(first_post)
+    print(session.get('_user_id'))
+    if session.get("_user_id") == None:
+        is_admin = False
+    else:
+        is_admin = db_session.create_session().get(User, session.get('_user_id')).status
     return render_template('main_page.html', posts=requests.get(
         f"http://127.0.0.1:5000/api/get_posts_from/{first_post}"
-    ).json())
+        ).json(),
+        is_admin=is_admin)
