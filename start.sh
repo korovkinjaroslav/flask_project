@@ -19,4 +19,3 @@ if [ -f "requirments.txt" ]; then
 fi
 
 echo "Starting application..."
-python -m main_directory.app
