@@ -1,1 +1,2 @@
+[deployment]
 run = "bash start.sh"
