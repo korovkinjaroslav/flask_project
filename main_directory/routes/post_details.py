@@ -1,4 +1,4 @@
-import requests
+import requests, os
 from flask import Blueprint, render_template, redirect, url_for, session
 from flask_login import login_required, current_user
 
@@ -10,9 +10,10 @@ from main_directory.models.data.users import User
 
 detail_router = Blueprint("detail_router", __name__)
 
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
 
 def _get_post_json(post_id):
-    r = requests.get(f"http://127.0.0.1:5000/api/posts/{post_id}")
+    r = requests.get(f"{BASE_URL}/api/posts/{post_id}")
     if r.status_code != 200:
         return None
     data = r.json()
