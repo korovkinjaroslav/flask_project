@@ -30,6 +30,7 @@ def start():
 @main_router.route("/main_page/<int:first_post>")
 def main_page(first_post):
     print(session.get('_user_id'))
+    print(f"{BASE_URL}/api/get_posts_from/{first_post}")
     if session.get("_user_id") == None:
         is_admin = False
     else:
