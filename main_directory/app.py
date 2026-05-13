@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from flask import Flask
 from flask_login import LoginManager
@@ -17,7 +18,8 @@ from main_directory.routes.create_post import create_post_router
 import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(12)
+_secret = os.environ.get("SECRET_KEY", "").strip()
+app.config["SECRET_KEY"] = _secret if _secret else secrets.token_hex(32)
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
     days=365
 )
@@ -57,7 +59,8 @@ app.register_blueprint(create_post_router)
 
 
 def main():
-    app.run()
+    port = int(os.environ.get("PORT", "5000"))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 
 if __name__ == '__main__':
