@@ -19,8 +19,11 @@ class Post(SqlAlchemyBase, SerializerMixin):
     created_at = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now)
 
+    theme_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("themes.id"), default=1)
+
     user = orm.relationship("User", back_populates="posts")
     comments = orm.relationship(
         "Comment", back_populates="post", cascade="all, delete-orphan")
     likes = orm.relationship(
         "Like", back_populates="post", cascade="all, delete-orphan")
+    theme = orm.relationship("Theme", back_populates="posts")
