@@ -11,7 +11,7 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-light bg-light border-bottom">
+    <nav class="navbar navbar-light bg-light border-bottom fixed-top">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand mb-0" href="/">MiniReddit</a>
             <div>
@@ -27,7 +27,7 @@
         </div>
     </nav>
 </header>
-<main role="main" class="container py-4">
+<main role="main" class="container" style="padding-top:4.5rem;">
     <div class="alert alert-danger" role="alert" id="messages" hidden="true" align="center"></div>
     {% block content %}{% endblock %}
 </main>
