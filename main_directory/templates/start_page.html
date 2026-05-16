@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h3 mb-0">Темы форума</h1>
+<ul class="list-group mt-3 forum-list">
+    {%for theme in themes.themes%}
+    <a class="section-link" href="/main_page/{{ theme.id }}">
+        <div class="card section-card">
+            <div class="card-body">
+                <div><p class="section-title h3 fw-bold mb-0 text-dark">{{ theme.title }}</p></div>
+                <div><span class="posts-badge text-success">Количество постов: {{ theme.amount_of_posts }}</span></div>
+            </div>
+        </div>
+    </a>{%endfor%}
+</ul>
+{% endblock %}

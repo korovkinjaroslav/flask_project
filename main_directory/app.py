@@ -6,7 +6,7 @@ from flask_login import LoginManager
 from flask_restful import reqparse, abort, Api, Resource
 
 
-from main_directory.models.data import db_session, posts_api, comment_api
+from main_directory.models.data import db_session, posts_api, comment_api, themes_api
 from main_directory.models.data.users import User
 from main_directory.routes.auth import auth_router
 from main_directory.routes.main import main_router
@@ -27,12 +27,13 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
 api = Api(app)
 api.add_resource(posts_api.PostResource, '/api/posts/<int:post_id>')
 api.add_resource(posts_api.PostListResource, '/api/posts')
-api.add_resource(posts_api.GetPosts, '/api/get_posts_from/<int:first_post>')
+api.add_resource(posts_api.GetPosts, '/api/get_posts_from/<int:theme>/<int:first_post>')
 api.add_resource(posts_api.DeletePost, '/api/delete_post/<int:post_id>')
 api.add_resource(like_api.LikePost, '/api/like/<int:post_id>')
 api.add_resource(like_api.RemoveLike, '/api/remove_like/<int:post_id>')
 api.add_resource(like_api.CheckLike, '/api/check_like/<int:post_id>')
 api.add_resource(comment_api.DeleteComment, '/api/delete_comment/<int:comment_id>')
+api.add_resource(themes_api.GetAllThemes, '/api/themes')
 
 _db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "db", "database.db")
 db_session.global_init(_db_path)

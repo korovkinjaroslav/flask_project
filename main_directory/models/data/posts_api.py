@@ -60,10 +60,10 @@ class PostListResource(Resource):
 
 
 class GetPosts(Resource):
-    def get(self, first_post):
+    def get(self, theme, first_post):
         res = {'posts': []}
         sess = db_session.create_session()
-        posts = sess.query(Post).filter(Post.id <= first_post).order_by(desc(Post.id)).limit(POSTS_ON_PAGE_LIMIT)
+        posts = sess.query(Post).filter(Post.id <= first_post, Post.theme_id == theme).order_by(desc(Post.id)).limit(POSTS_ON_PAGE_LIMIT)
         n = posts.count()
         if n == 0:
             res['first_post_of_next_page'] = 0

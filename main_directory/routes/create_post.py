@@ -11,9 +11,9 @@ from main_directory.models.data.posts import Post
 create_post_router = Blueprint("create_post_router", __name__)
 
 
-@create_post_router.route("/create_post", methods=['GET', 'POST'])
+@create_post_router.route("/create_post/<int:theme>", methods=['GET', 'POST'])
 @login_required
-def create_post():
+def create_post(theme):
     form = CreatePostForm()
     if form.validate_on_submit():
         sess = db_session.create_session()
@@ -34,8 +34,9 @@ def create_post():
             image=image_dataurl,
             user_id=current_user.id,
             likes_amount=0,
+            theme_id = theme,
         )
         sess.add(post)
         sess.commit()
-        return redirect(f"/main_page/{post.id}")
+        return redirect(f"/main_page/{theme}/{post.id}")
     return render_template('create_post.html', title='Новый пост', form=form)
